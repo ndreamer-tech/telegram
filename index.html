@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>읽으며 듣기</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root{
@@ -178,12 +179,14 @@ function tick() {
     for (let k = 0; k < SENTS.length; k++) if (SENTS[k].t0 <= ms) i = k;
   }
   if (i !== cur) {
-    if (cur >= 0) { closeSentence(cur); SENTS[cur].el.classList.add('done'); SENTS[cur].el.classList.remove('now'); }
+    if (cur >= 0) { closeSentence(cur); SENTS[cur].el.classList.remove('now'); }
     cur = i;
     openSentence(cur);
-    SENTS[cur].el.classList.add('now');
-    SENTS[cur].el.classList.remove('done');
-    SENTS.forEach((s, k) => { if (k > cur) s.el.classList.remove('done'); });
+    // 건너뛰어 들어와도 지난 문장이 모두 흐려지게 매번 전체를 다시 칠한다(문장이 바뀔 때만 돈다)
+    SENTS.forEach((s, k) => {
+      s.el.classList.toggle('done', k < cur);
+      s.el.classList.toggle('now', k === cur);
+    });
     try { SENTS[cur].el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
   }
   const s = SENTS[cur];
